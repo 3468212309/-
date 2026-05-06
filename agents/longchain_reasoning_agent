@@ -1,0 +1,21 @@
+import anthropic
+
+class LongChainReasoningAgent:
+    def __init__(self, api_key):
+        self.client = anthropic.Anthropic(api_key=api_key)
+
+    def reason_causal_chain(self, spectral_features, variety_name):
+        prompt = f"""
+        请沿以下因果链推理棉花品种 {variety_name} 的黄萎病抗性：
+        光谱反射率特征：{spectral_features}
+        → 计算植被指数 → 评估叶绿素含量与冠层温度
+        → 推断病害胁迫响应程度（轻度/中度/重度）
+        → 输出抗性排序（高抗/中抗/感病）
+        请给出推理过程与最终抗性等级。
+        """
+        response = self.client.messages.create(
+            model="claude-3-sonnet-20240229",
+            max_tokens=500,
+            messages=[{"role": "user", "content": prompt}]
+        )
+        return response.content[0].text
