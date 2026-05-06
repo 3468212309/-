@@ -1,0 +1,23 @@
+from agents.data_preprocess_agent import DataPreprocessAgent
+from agents.longchain_reasoning_agent import LongChainReasoningAgent
+from agents.modeling_agent import ModelingAgent
+
+def main():
+    print("启动棉花黄萎病抗性反演 Agent ...")
+    preprocess = DataPreprocessAgent(config)
+    raw_data = pd.read_csv("./data/sample_data.csv")
+    cleaned = preprocess.denoise(raw_data.values)
+    features = preprocess.extract_features(cleaned)
+
+    reasoning = LongChainReasoningAgent(api_key="your_key")
+    for variety in features['variety'].unique():
+        result = reasoning.reason_causal_chain(features[features['variety']==variety], variety)
+        print(f"{variety}: {result}")
+
+    modeling = ModelingAgent(model_type="cnn_rnn")
+    modeling.train(features, labels)
+    modeling.predict()
+    modeling.generate_report(output_dir="./outputs")
+
+if __name__ == "__main__":
+    main()
